@@ -34,7 +34,6 @@ namespace Phoneword.UWP
             }
         }
 
-
         async Task<PhoneLine> GetDefaultPhoneLineAsync()
         {
             var phoneCallStore = await PhoneCallManager.RequestStoreAsync();

@@ -6,27 +6,29 @@ using Microsoft.Identity.Client;
 
 namespace TodoAzure.Droid
 {
-	[Activity(Label = "TodoAzure.Droid",
-		Icon = "@drawable/icon",
-		MainLauncher = true,
-		ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
-		Theme = "@android:style/Theme.Holo.Light")]
-	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
-	{
-		protected override void OnCreate(Bundle bundle)
-		{
-			base.OnCreate(bundle);
+    [Activity(Label = "TodoAzure.Droid",
+        Icon = "@drawable/icon",
+        Theme = "@style/MainTheme", MainLauncher = true,
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    {
+        protected override void OnCreate(Bundle bundle)
+        {
+            TabLayoutResource = Resource.Layout.Tabbar;
+            ToolbarResource = Resource.Layout.Toolbar;
 
-			global::Xamarin.Forms.Forms.Init(this, bundle);
-			Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
-			LoadApplication(new App());
-			App.AuthenticationProvider.Initialize(new PlatformParameters(Xamarin.Forms.Forms.Context as Activity));
-		}
+            base.OnCreate(bundle);
 
-		protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
-		{
-			base.OnActivityResult(requestCode, resultCode, data);
-			AuthenticationAgentContinuationHelper.SetAuthenticationAgentContinuationEventArgs(requestCode, resultCode, data);
-		}
-	}
+            global::Xamarin.Forms.Forms.Init(this, bundle);
+            Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
+            LoadApplication(new App());
+            App.UiParent = new UIParent(this);
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode, resultCode, data);
+        }
+    }
 }

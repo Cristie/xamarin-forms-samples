@@ -1,27 +1,26 @@
-﻿using System;
-
-using Android.App;
-using Android.Content;
+﻿using Android.App;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
 
 namespace TodoASMX.Droid
 {
-	[Activity (Label = "TodoASMX.Droid", Icon = "@drawable/icon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
-	{
-		protected override void OnCreate (Bundle bundle)
-		{
-			base.OnCreate (bundle);
+    [Activity(Label = "TodoASMX.Droid", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    {
+        internal static MainActivity Instance { get; private set; }
 
-			global::Xamarin.Forms.Forms.Init (this, bundle);
+        protected override void OnCreate(Bundle bundle)
+        {
+            TabLayoutResource = Resource.Layout.Tabbar;
+            ToolbarResource = Resource.Layout.Toolbar;
 
-			App.TodoManager = new TodoItemManager (new SoapService ());
-			App.Speech = new Speech ();
-			LoadApplication (new App ());
-		}
-	}
+            base.OnCreate(bundle);
+            Instance = this;
+            global::Xamarin.Forms.Forms.Init(this, bundle);
+
+            App.TodoManager = new TodoItemManager(new SoapService());
+            App.Speech = new Speech();
+            LoadApplication(new App());
+        }
+    }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-
-using Android.App;
-using Android.Content;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
+﻿using Android.App;
 using Android.OS;
 
 using Xamarin.Forms.Platform.Android;
@@ -12,17 +6,21 @@ using Xamarin.Forms.Platform.Android;
 
 namespace TodoLocalized
 {
-	[Activity (Label = "Todo.Android.Android", MainLauncher = true)]
-	public class MainActivity : FormsApplicationActivity
-	{
-		protected override void OnCreate (Bundle bundle)
-		{
-			base.OnCreate (bundle);
+    [Activity(Label = "Todo.Android.Android", Theme = "@style/MainTheme", MainLauncher = true)]
+    public class MainActivity : FormsAppCompatActivity
+    {
+        internal static MainActivity Instance { get; private set; }
 
-			Xamarin.Forms.Forms.Init (this, bundle);
+        protected override void OnCreate(Bundle bundle)
+        {
+            TabLayoutResource = Resource.Layout.Tabbar;
+            ToolbarResource = Resource.Layout.Toolbar;
 
-			LoadApplication (new App ());
-		}
-	}
+            base.OnCreate(bundle);
+            Instance = this;
+            Xamarin.Forms.Forms.Init(this, bundle);
+            LoadApplication(new App());
+        }
+    }
 }
 

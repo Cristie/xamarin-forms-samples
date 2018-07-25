@@ -37,7 +37,7 @@ namespace WorkingWithPlatformSpecifics
 			if (Device.RuntimePlatform == Device.iOS)
             {
 				heading.Text += "iOS";
-			} else { // could be Android or WinPhone
+			} else { // could be Android or UWP
 				heading.Text += Device.RuntimePlatform;
 			}
 
@@ -54,8 +54,7 @@ namespace WorkingWithPlatformSpecifics
                 case Device.Android:
                     width = 40;
                     break;
-                case Device.WinPhone:
-                case Device.Windows:
+                case Device.UWP:
                 default:
                     width = 50;
                     break;
@@ -77,8 +76,7 @@ namespace WorkingWithPlatformSpecifics
                     box.Color = box.Color.AddLuminosity(0.3);
                     heading.TextColor = Color.FromRgb(115, 129, 130);
                     break;
-                case Device.WinPhone:
-                case Device.Windows:
+                case Device.UWP:
                     box.Color = box.Color.AddLuminosity(0.3);
                     heading.TextColor = Color.Accent;
                     break;
@@ -101,8 +99,7 @@ namespace WorkingWithPlatformSpecifics
                 case Device.Android:
                     width = 300;
                     break;
-                case Device.WinPhone:
-                case Device.Windows:
+                case Device.UWP:
                 default:
                     width = 150;
                     break;
@@ -131,7 +128,7 @@ namespace WorkingWithPlatformSpecifics
 				Text = "Open Uri"
 			};
 			webButton.Clicked += ((sender, e) => 
-				Device.OpenUri(new Uri("https://xamarin.com/evolve")));
+				Device.OpenUri(new Uri("https://xamarin.com/about")));
 
             double top = 0;
             if (Device.RuntimePlatform == Device.iOS)

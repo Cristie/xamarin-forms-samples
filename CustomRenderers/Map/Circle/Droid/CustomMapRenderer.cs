@@ -1,4 +1,5 @@
-﻿using Android.Gms.Maps.Model;
+﻿using Android.Content;
+using Android.Gms.Maps.Model;
 using MapOverlay;
 using MapOverlay.Droid;
 using Xamarin.Forms;
@@ -10,7 +11,10 @@ namespace MapOverlay.Droid
     public class CustomMapRenderer : MapRenderer
     {
         CustomCircle circle;
-        bool isDrawn;
+
+        public CustomMapRenderer(Context context) : base(context)
+        {
+        }
 
         protected override void OnElementChanged(Xamarin.Forms.Platform.Android.ElementChangedEventArgs<Xamarin.Forms.Maps.Map> e)
         {
@@ -29,22 +33,18 @@ namespace MapOverlay.Droid
             }
         }
 
-        protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        protected override void OnMapReady(Android.Gms.Maps.GoogleMap map)
         {
-            base.OnElementPropertyChanged(sender, e);
+            base.OnMapReady(map);
 
-            if (e.PropertyName.Equals("VisibleRegion") && !isDrawn)
-            {
-                var circleOptions = new CircleOptions();
-                circleOptions.InvokeCenter(new LatLng(circle.Position.Latitude, circle.Position.Longitude));
-                circleOptions.InvokeRadius(circle.Radius);
-                circleOptions.InvokeFillColor(0X66FF0000);
-                circleOptions.InvokeStrokeColor(0X66FF0000);
-                circleOptions.InvokeStrokeWidth(0);
+            var circleOptions = new CircleOptions();
+            circleOptions.InvokeCenter(new LatLng(circle.Position.Latitude, circle.Position.Longitude));
+            circleOptions.InvokeRadius(circle.Radius);
+            circleOptions.InvokeFillColor(0X66FF0000);
+            circleOptions.InvokeStrokeColor(0X66FF0000);
+            circleOptions.InvokeStrokeWidth(0);
 
-                NativeMap.AddCircle(circleOptions);
-                isDrawn = true;
-            }
+            NativeMap.AddCircle(circleOptions);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Android.Content;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
@@ -17,7 +16,10 @@ namespace CustomRenderer.Droid
     public class CustomMapRenderer : MapRenderer, GoogleMap.IInfoWindowAdapter
     {
         List<CustomPin> customPins;
-        bool isDrawn;
+
+        public CustomMapRenderer(Context context) : base(context)
+        {
+        }
 
         protected override void OnElementChanged(Xamarin.Forms.Platform.Android.ElementChangedEventArgs<Map> e)
         {
@@ -36,38 +38,22 @@ namespace CustomRenderer.Droid
             }
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override void OnMapReady(GoogleMap map)
         {
-            base.OnElementPropertyChanged(sender, e);
+            base.OnMapReady(map);
 
-            if (e.PropertyName.Equals("VisibleRegion") && !isDrawn)
-            {
-                NativeMap.Clear();
-                NativeMap.InfoWindowClick += OnInfoWindowClick;
-                NativeMap.SetInfoWindowAdapter(this);
-
-                foreach (var pin in customPins)
-                {
-                    var marker = new MarkerOptions();
-                    marker.SetPosition(new LatLng(pin.Pin.Position.Latitude, pin.Pin.Position.Longitude));
-                    marker.SetTitle(pin.Pin.Label);
-                    marker.SetSnippet(pin.Pin.Address);
-                    marker.SetIcon(BitmapDescriptorFactory.FromResource(Resource.Drawable.pin));
-
-                    NativeMap.AddMarker(marker);
-                }
-                isDrawn = true;
-            }
+            NativeMap.InfoWindowClick += OnInfoWindowClick;
+            NativeMap.SetInfoWindowAdapter(this);
         }
 
-        protected override void OnLayout(bool changed, int l, int t, int r, int b)
+        protected override MarkerOptions CreateMarker(Pin pin)
         {
-            base.OnLayout(changed, l, t, r, b);
-
-            if (changed)
-            {
-                isDrawn = false;
-            }
+            var marker = new MarkerOptions();
+            marker.SetPosition(new LatLng(pin.Position.Latitude, pin.Position.Longitude));
+            marker.SetTitle(pin.Label);
+            marker.SetSnippet(pin.Address);
+            marker.SetIcon(BitmapDescriptorFactory.FromResource(Resource.Drawable.pin));
+            return marker;
         }
 
         void OnInfoWindowClick(object sender, GoogleMap.InfoWindowClickEventArgs e)
@@ -100,7 +86,7 @@ namespace CustomRenderer.Droid
                     throw new Exception("Custom pin not found");
                 }
 
-                if (customPin.Id == "Xamarin")
+                if (customPin.Id.ToString() == "Xamarin")
                 {
                     view = inflater.Inflate(Resource.Layout.XamarinMapInfoWindow, null);
                 }
@@ -136,7 +122,7 @@ namespace CustomRenderer.Droid
             var position = new Position(annotation.Position.Latitude, annotation.Position.Longitude);
             foreach (var pin in customPins)
             {
-                if (pin.Pin.Position == position)
+                if (pin.Position == position)
                 {
                     return pin;
                 }

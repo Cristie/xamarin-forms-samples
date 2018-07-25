@@ -2,19 +2,20 @@
 using Android.App;
 using Android.OS;
 using System.IO;
-using Android;
 using EmployeeDirectoryUI;
 using Android.Content.PM;
 using Android.Support.V4.Content;
 using Android.Support.V4.App;
 using Android.Widget;
+using Xamarin.Forms.Platform.Android;
 
 namespace EmployeeDirectory.Android
 {
-    [Activity(Label = "EmployeeDirectory", MainLauncher = true,
+	[Activity(Label = "EmployeeDirectory", Theme = "@style/MainTheme", MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : Xamarin.Forms.Platform.Android.FormsApplicationActivity
+	public class MainActivity : FormsAppCompatActivity
     {
+        internal static MainActivity Instance { get; private set; }
 
         public interface IPermissionCallback
         {
@@ -27,7 +28,11 @@ namespace EmployeeDirectory.Android
 
         protected override void OnCreate(Bundle bundle)
         {
+			TabLayoutResource = Resource.Layout.Tabbar;
+			ToolbarResource = Resource.Layout.Toolbar;
+
             base.OnCreate(bundle);
+            Instance = this;
 
             CopyInfoIntoWorkingFolder("XamarinDirectory.csv",
                 EmployeeDirectory.Android.Resource.Raw.XamarinDirectory);

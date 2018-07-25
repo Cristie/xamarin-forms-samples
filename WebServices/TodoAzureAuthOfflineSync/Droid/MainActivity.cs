@@ -4,20 +4,24 @@ using Android.OS;
 
 namespace TodoAzure.Droid
 {
-	[Activity(Label = "TodoAzure.Droid",
-		Icon = "@drawable/icon",
-		MainLauncher = true,
-		ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation,
-		Theme = "@android:style/Theme.Holo.Light")]
-	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
-	{
-		protected override void OnCreate(Bundle bundle)
-		{
-			base.OnCreate(bundle);
+    [Activity(Label = "TodoAzure.Droid",
+        Icon = "@drawable/icon",
+        Theme = "@style/MainTheme", MainLauncher = true,
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    {
+        internal static MainActivity Instance { get; private set; }
 
-			global::Xamarin.Forms.Forms.Init(this, bundle);
-			Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
-			LoadApplication(new App());
-		}
-	}
+        protected override void OnCreate(Bundle bundle)
+        {
+            TabLayoutResource = Resource.Layout.Tabbar;
+            ToolbarResource = Resource.Layout.Toolbar;
+
+            base.OnCreate(bundle);
+            Instance = this;
+            global::Xamarin.Forms.Forms.Init(this, bundle);
+            Microsoft.WindowsAzure.MobileServices.CurrentPlatform.Init();
+            LoadApplication(new App());
+        }
+    }
 }

@@ -1,58 +1,66 @@
 ﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace PlatformSpecifics
 {
-	public partial class PlatformSpecificsPage : ContentPage
-	{
-		public PlatformSpecificsPage()
+    public partial class PlatformSpecificsPage : ContentPage
+    {
+        Page _originalRoot;
+
+		public ICommand NavigateCommand { get; private set; }
+
+        public PlatformSpecificsPage()
+        {
+            InitializeComponent();
+
+			NavigateCommand = new Command<Type>(async (pageType) => await NavigateToPage(pageType));
+			BindingContext = this;
+        }
+
+		async Task NavigateToPage(Type pageType)
 		{
-			InitializeComponent();
+			Type[] types = new Type[] { typeof(Command) };
+			ConstructorInfo info = pageType.GetConstructor(types);
+			if (info != null)
+			{
+				Page page = (Page)Activator.CreateInstance(pageType, new Command(RestoreOriginal));
+				if (page is iOSLargeTitlePage || page is iOSTranslucentNavigationBarPage)
+				{
+					page = new iOSNavigationPage(page);
+				}
+				SetRoot(page);
+			}
+			else
+			{
+				Page page = (Page)Activator.CreateInstance(pageType);
+				await Navigation.PushAsync(page);
+			}         
 		}
 
-		async void OnBlurEffectButtonClicked(object sender, EventArgs e)
-		{
-			await Navigation.PushAsync(new iOSBlurEffectPage());
-		}
+        void SetRoot(Page page)
+        {
+            var app = Application.Current as App;
+            if (app == null)
+            {
+                return;
+            }
 
-		async void OnTranslucentNavigationBarButtonClicked(object sender, EventArgs e)
-		{
-			await DisplayAlert("Alert", "Edit App.xaml.cs to view this platform specific.", "OK");
-		}
+            _originalRoot = app.MainPage;
+            app.SetMainPage(page);
+        }
 
-		async void OnEntryFontSizeChangesButtonClicked(object sender, EventArgs e)
-		{
-			await Navigation.PushAsync(new iOSEntryPage());
-		}
+        void RestoreOriginal()
+        {
+            if (_originalRoot == null)
+            {
+                return;
+            }
 
-		async void OnHideStatusBarButtonClicked(object sender, EventArgs e)
-		{
-			await Navigation.PushAsync(new iOSStatusBarPage());
-		}
-
-		async void OnSoftInputModeAdjustButtonClicked(object sender, EventArgs e)
-		{
-			await Navigation.PushAsync(new AndroidSoftInputModeAdjustPage());
-		}
-
-		async void OnPageLifecycleEventsButtonClicked(object sender, EventArgs e)
-		{
-			await Navigation.PushAsync(new AndroidLifecycleEventsPage());
-		}
-
-		async void OnTabbedPageButtonClicked(object sender, EventArgs e)
-		{
-			await DisplayAlert("Alert", "Edit App.xaml.cs to view this platform specific.", "OK");
-		}
-
-		async void OnNavigationPageButtonClicked(object sender, EventArgs e)
-		{
-			await DisplayAlert("Alert", "Edit App.xaml.cs to view this platform specific.", "OK");
-		}
-
-		async void OnMasterDetailPageButtonClicked(object sender, EventArgs e)
-		{
-			await DisplayAlert("Alert", "Edit App.xaml.cs to view this platform specific.", "OK");
-		}
-	}
+            var app = Application.Current as App;
+            app?.SetMainPage(_originalRoot);
+        }
+    }
 }

@@ -33,7 +33,6 @@ namespace Phoneword.UWP
                 dialled = false;
             }
         }
-        
 
         async Task<PhoneLine> GetDefaultPhoneLineAsync()
         {

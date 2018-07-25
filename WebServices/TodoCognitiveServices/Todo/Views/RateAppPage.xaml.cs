@@ -2,74 +2,81 @@
 using System.Diagnostics;
 using System.Linq;
 using Xamarin.Forms;
-using Microsoft.ProjectOxford.Emotion;
-using Microsoft.ProjectOxford.Emotion.Contract;
 using Plugin.Media;
 using Plugin.Media.Abstractions;
+using Todo.Exceptions;
+using Todo.Models;
+using Todo.Services;
 
 namespace Todo
 {
-	public partial class RateAppPage : ContentPage
-	{
-		EmotionServiceClient emotionClient;
-		MediaFile photo;
+    public partial class RateAppPage : ContentPage
+    {
+		IFaceRecognitionService _faceRecognitionService;
+        MediaFile photo;
 
-		public RateAppPage()
-		{
-			InitializeComponent();
-			emotionClient = new EmotionServiceClient(Constants.EmotionApiKey);
-		}
+        public RateAppPage()
+        {
+            InitializeComponent();
 
-		async void OnTakePhotoButtonClicked(object sender, EventArgs e)
-		{
-			await CrossMedia.Current.Initialize();
+			_faceRecognitionService = new FaceRecognitionService();
+        }
 
-			// Take photo
-			if (CrossMedia.Current.IsCameraAvailable || CrossMedia.Current.IsTakePhotoSupported)
-			{
-				photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
-				{
-					Name = "emotion.jpg",
-					PhotoSize = PhotoSize.Small
-				});
+        async void OnTakePhotoButtonClicked(object sender, EventArgs e)
+        {
+            await CrossMedia.Current.Initialize();
 
-				if (photo != null)
-				{
-					image.Source = ImageSource.FromStream(photo.GetStream);
-				}
-			}
-			else
-			{
-				await DisplayAlert("No Camera", "Camera unavailable.", "OK");
-			}
+            // Take photo
+            if (CrossMedia.Current.IsCameraAvailable || CrossMedia.Current.IsTakePhotoSupported)
+            {
+                photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
+                {
+                    Name = "emotion.jpg",
+                    PhotoSize = PhotoSize.Small
+                });
 
-			((Button)sender).IsEnabled = false;
-			activityIndicator.IsRunning = true;
+                if (photo != null)
+                {
+                    image.Source = ImageSource.FromStream(photo.GetStream);
+                }
+            }
+            else
+            {
+                await DisplayAlert("No Camera", "Camera unavailable.", "OK");
+            }
 
-			// Recognize emotion
-			try
-			{
-				if (photo != null)
-				{
-					using (var photoStream = photo.GetStream())
-					{
-						Emotion[] emotionResult = await emotionClient.RecognizeAsync(photoStream);
-						if (emotionResult.Any())
-						{
-							// Emotions detected are happiness, sadness, surprise, anger, fear, contempt, disgust, or neutral.
-							emotionResultLabel.Text = emotionResult.FirstOrDefault().Scores.ToRankedList().FirstOrDefault().Key;
-						}
-						photo.Dispose();
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex.Message);
-			}
+            ((Button)sender).IsEnabled = false;
+            activityIndicator.IsRunning = true;
 
-			activityIndicator.IsRunning = false;
-			((Button)sender).IsEnabled = true;
-		}
-	}
+            // Recognize emotion
+            try
+            {
+                if (photo != null)
+                {
+                    var faceAttributes = new FaceAttributeType[] { FaceAttributeType.Emotion };
+                    using (var photoStream = photo.GetStream())
+                    {
+						Face[] faces = await _faceRecognitionService.DetectAsync(photoStream, true, false, faceAttributes);
+                        if (faces.Any())
+                        {
+                            // Emotions detected are happiness, sadness, surprise, anger, fear, contempt, disgust, or neutral.
+                            emotionResultLabel.Text = faces.FirstOrDefault().FaceAttributes.Emotion.ToRankedList().FirstOrDefault().Key;
+                        }
+                        photo.Dispose();
+                    }
+                }
+            }
+            catch (FaceAPIException fx)
+            {
+                Debug.WriteLine(fx.Message);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            activityIndicator.IsRunning = false;
+            ((Button)sender).IsEnabled = true;
+        }
+    }
 }

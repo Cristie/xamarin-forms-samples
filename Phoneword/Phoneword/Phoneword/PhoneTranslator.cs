@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Core
+namespace Phoneword
 {
     public static class PhonewordTranslator
     {
@@ -34,8 +34,7 @@ namespace Core
             return keyString.IndexOf(c) >= 0;
         }
 
-        static readonly string[] digits =
-        {
+        static readonly string[] digits = {
             "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"
         };
 

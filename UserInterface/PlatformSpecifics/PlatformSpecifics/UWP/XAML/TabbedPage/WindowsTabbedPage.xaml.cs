@@ -1,13 +1,16 @@
 ﻿using System;
-using Xamarin.Forms;
+using System.Windows.Input;
 
 namespace PlatformSpecifics
 {
-    public partial class WindowsTabbedPage : TabbedPage
+    public partial class WindowsTabbedPage : Xamarin.Forms.TabbedPage
     {
-        public WindowsTabbedPage()
+        public WindowsTabbedPage(ICommand restore)
         {
             InitializeComponent();
+            
+            Children.Add(new ContentPageOneInTabbedPage(restore));
+            Children.Add(new ContentPageTwo(restore));
         }
 
         async void OnToolbarItemClicked(object sender, EventArgs e)
